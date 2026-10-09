@@ -27,9 +27,12 @@ export default function ScreeningInput({
     if (file) {
       setSelectedImage(file);
       setImagePreview(URL.createObjectURL(file));
+      setIsSynthetic(false); // Genuine user submission
       setOcrStatus(null);
       setOcrProgress(0);
       setOcrMessage('');
+      // Auto-run OCR on uploaded image immediately
+      runOcrOnImage(file);
     }
   };
 
@@ -42,35 +45,39 @@ export default function ScreeningInput({
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const runOcrOnImage = async () => {
-    if (!selectedImage && !imagePreview) return;
+  const runOcrOnImage = async (fileOverride = null) => {
+    const fileToProcess = fileOverride || selectedImage || imagePreview;
+    if (!fileToProcess) return;
     try {
       setOcrStatus('processing');
-      setOcrMessage('Initializing client-side OCR engine...');
+      setOcrMessage('Initializing in-browser OCR engine (Tesseract.js)...');
       setOcrProgress(15);
 
       const worker = await createWorker('eng');
-      setOcrMessage('Processing label image...');
+      setOcrMessage('Recognizing text from packaging image...');
       setOcrProgress(50);
 
-      const ret = await worker.recognize(selectedImage || imagePreview);
+      const ret = await worker.recognize(fileToProcess);
       await worker.terminate();
 
-      const extractedText = ret.data.text.trim();
+      const extractedText = (ret.data?.text || '').trim();
       setOcrProgress(100);
-      setOcrStatus('completed');
-      setOcrMessage(`Successfully extracted ${extractedText.length} characters.`);
 
-      if (extractedText) {
-        setInputText((prev) => {
-          if (!prev) return extractedText;
-          return `${prev}\n\n[OCR Extracted Text]:\n${extractedText}`;
-        });
+      if (extractedText && extractedText.length > 0) {
+        setOcrStatus('completed');
+        setOcrMessage(`Successfully extracted ${extractedText.length} characters from image.`);
+        setInputText(extractedText);
+        setIsSynthetic(false);
+      } else {
+        setOcrStatus('empty');
+        setOcrMessage(
+          'Notice: No readable text could be recognized. The photo may be low-contrast or blurred. Please type or paste the printed claim text manually.'
+        );
       }
     } catch (err) {
       console.error('OCR Error:', err);
       setOcrStatus('failed');
-      setOcrMessage('OCR extraction encountered an issue. You can still paste or type text directly.');
+      setOcrMessage('OCR encountered an issue processing this image. Please paste or type the claim text directly.');
     }
   };
 
@@ -135,7 +142,10 @@ export default function ScreeningInput({
           <input
             type="text"
             value={productName}
-            onChange={(e) => setProductName(e.target.value)}
+            onChange={(e) => {
+              setProductName(e.target.value);
+              setIsSynthetic(false);
+            }}
             placeholder="e.g. PureDrop 1L Packaged Drinking Water or UltraSafe Helmet"
             className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-govblue-600 focus:border-govblue-600 bg-slate-50/50"
           />
@@ -242,7 +252,10 @@ export default function ScreeningInput({
           <textarea
             rows={5}
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(e) => {
+              setInputText(e.target.value);
+              setIsSynthetic(false);
+            }}
             placeholder="Paste product specifications, advertisement copy, or packaging text here... (e.g. 'Conforms to IS 14543, ISI mark CM/L-1234567' or '100% BIS Approved product')"
             className="w-full text-xs sm:text-sm p-3.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-govblue-600 focus:border-govblue-600 bg-slate-50/50 font-sans"
           />

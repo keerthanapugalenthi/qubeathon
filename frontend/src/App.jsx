@@ -5,8 +5,10 @@ import ScreeningInput from './components/ScreeningInput.jsx';
 import ScreeningResult from './components/ScreeningResult.jsx';
 import RecentCases from './components/RecentCases.jsx';
 import ReportModal from './components/ReportModal.jsx';
+import IntelligenceDashboard from './components/IntelligenceDashboard.jsx';
 
 export default function App() {
+  const [activeNav, setActiveNav] = useState('screening'); // 'screening' or 'intelligence'
   const [backendOnline, setBackendOnline] = useState(false);
   const [samples, setSamples] = useState([]);
   const [recentCases, setRecentCases] = useState([]);
@@ -152,7 +154,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
-      <Header backendOnline={backendOnline} />
+      <Header
+        backendOnline={backendOnline}
+        activeNav={activeNav}
+        setActiveNav={setActiveNav}
+      />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {/* Error Banner */}
@@ -168,44 +174,51 @@ export default function App() {
           </div>
         )}
 
-        {/* 1. Synthetic Demo Cases Carousel / Pills */}
-        <DemoSamples
-          samples={samples}
-          onSelectSample={handleSelectSample}
-          loading={loading}
-        />
+        {/* View Switcher: Intelligence vs Screening */}
+        {activeNav === 'intelligence' ? (
+          <IntelligenceDashboard />
+        ) : (
+          <>
+            {/* 1. Synthetic Demo Cases Carousel / Pills */}
+            <DemoSamples
+              samples={samples}
+              onSelectSample={handleSelectSample}
+              loading={loading}
+            />
 
-        {/* 2. Screening Input Component */}
-        <ScreeningInput
-          productName={productName}
-          setProductName={setProductName}
-          inputText={inputText}
-          setInputText={setInputText}
-          selectedImage={selectedImage}
-          setSelectedImage={setSelectedImage}
-          imagePreview={imagePreview}
-          setImagePreview={setImagePreview}
-          isSynthetic={isSynthetic}
-          setIsSynthetic={setIsSynthetic}
-          onScreen={handleScreenClaim}
-          loading={loading}
-        />
+            {/* 2. Screening Input Component */}
+            <ScreeningInput
+              productName={productName}
+              setProductName={setProductName}
+              inputText={inputText}
+              setInputText={setInputText}
+              selectedImage={selectedImage}
+              setSelectedImage={setSelectedImage}
+              imagePreview={imagePreview}
+              setImagePreview={setImagePreview}
+              isSynthetic={isSynthetic}
+              setIsSynthetic={setIsSynthetic}
+              onScreen={handleScreenClaim}
+              loading={loading}
+            />
 
-        {/* 3. Screening Results Card */}
-        {screeningResult && (
-          <ScreeningResult
-            result={screeningResult}
-            onOpenReport={(res) => setActiveReportModal(res)}
-          />
+            {/* 3. Screening Results Card */}
+            {screeningResult && (
+              <ScreeningResult
+                result={screeningResult}
+                onOpenReport={(res) => setActiveReportModal(res)}
+              />
+            )}
+
+            {/* 4. Recent Cases Table (SQLite History) */}
+            <RecentCases
+              cases={recentCases}
+              onSelectCase={handleSelectCaseById}
+              onRefresh={loadRecentCases}
+              loading={loading}
+            />
+          </>
         )}
-
-        {/* 4. Recent Cases Table (SQLite History) */}
-        <RecentCases
-          cases={recentCases}
-          onSelectCase={handleSelectCaseById}
-          onRefresh={loadRecentCases}
-          loading={loading}
-        />
       </main>
 
       {/* 5. Printable Investigation Report Dossier Modal */}

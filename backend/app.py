@@ -13,6 +13,7 @@ from rules import (
     REGULATORY_DISCLAIMER,
     OFFICIAL_VERIFICATION_RESOURCES
 )
+from intelligence import get_intelligence_data
 
 app = Flask(__name__)
 CORS(app)  # Enable cross-origin requests for the React frontend
@@ -161,6 +162,19 @@ def get_case(case_id):
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/api/intelligence", methods=["GET"])
+def intelligence_dashboard():
+    """
+    Retrieve aggregated intelligence metrics across stored cases.
+    Supports ?scope=all | ?scope=synthetic_only | ?scope=real_only
+    """
+    try:
+        scope = request.args.get("scope", "real_only")
+        data = get_intelligence_data(scope=scope)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": f"Intelligence calculation failed: {str(e)}"}), 500
 
 @app.route("/api/uploads/<filename>", methods=["GET"])
 def get_uploaded_file(filename):

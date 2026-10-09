@@ -150,10 +150,32 @@ export default function ReportModal({ caseData, onClose }) {
             </div>
           </div>
 
+          {/* Official Verification Status Section */}
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+              4. Genuine Certification Verification Status
+            </h3>
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-800">Live BIS Registry API:</span>
+                <span className="font-mono-code font-bold text-[10px] px-2 py-0.5 rounded bg-slate-200 text-slate-700">
+                  NOT PUBLICLY AVAILABLE
+                </span>
+              </div>
+              <p className="text-slate-600 leading-relaxed text-[11px]">
+                The Bureau of Indian Standards does not offer a public automated API for third-party automated lookups.
+                Official verification must be performed through user-authenticated BIS portals or the BIS Care App.
+              </p>
+              <div className="bg-white p-2.5 rounded-lg border border-slate-200 text-govblue-900 font-medium text-[11px]">
+                <strong>Official Route:</strong> Use BIS Care Mobile App ('Verify Licence Details' / 'Verify R-Number') or ManakOnline (www.manakonline.in).
+              </div>
+            </div>
+          </div>
+
           {/* Recommended Investigation Protocols */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-              4. Recommended Human Verification Protocols
+              5. Recommended Human Verification Protocols
             </h3>
             <ol className="space-y-1.5 list-decimal list-inside text-xs text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
               {caseData.recommended_steps &&

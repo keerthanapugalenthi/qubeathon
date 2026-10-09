@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   AlertTriangle,
   CheckCircle,
@@ -9,7 +8,8 @@ import {
   ChevronRight,
   Printer,
   Copy,
-  Info
+  Info,
+  ShieldAlert
 } from 'lucide-react';
 
 export default function ScreeningResult({ result, onOpenReport }) {
@@ -28,7 +28,8 @@ export default function ScreeningResult({ result, onOpenReport }) {
     recommended_steps,
     is_synthetic,
     disclaimer,
-    official_resources
+    official_resources,
+    official_verification
   } = result;
 
   const getStatusBadgeConfig = () => {
@@ -97,9 +98,14 @@ export default function ScreeningResult({ result, onOpenReport }) {
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            {is_synthetic && (
+            {is_synthetic ? (
               <span className="text-[11px] font-semibold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full border border-amber-300">
                 Synthetic Sample
+              </span>
+            ) : (
+              <span className="text-[11px] font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                Live User Submission (SQLite)
               </span>
             )}
             <span className="text-xs font-mono-code bg-white/80 px-2.5 py-1 rounded-lg border border-slate-200 font-semibold text-slate-700">
@@ -116,6 +122,33 @@ export default function ScreeningResult({ result, onOpenReport }) {
           <Info className="w-4 h-4 flex-shrink-0 text-slate-500 mt-0.5" />
           <span>
             <strong>Legal Safety Notice:</strong> {disclaimer}
+          </span>
+        </div>
+      </div>
+
+      {/* Genuine Certification Verification Status Card */}
+      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4.5 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-slate-700" />
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              Genuine Certification Verification Status
+            </h4>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 border border-slate-300 self-start sm:self-auto">
+            Official Live API: Not Available
+          </span>
+        </div>
+        <p className="text-xs text-slate-600 leading-relaxed mb-2.5">
+          {official_verification?.notice ||
+            "The Bureau of Indian Standards (BIS) does not provide a public automated API for programmatic licence validation. Verification must be executed directly through official BIS portals or the BIS Care App."}
+        </p>
+        <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs text-govblue-900 font-medium flex items-start gap-2">
+          <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 text-govblue-700 mt-0.5" />
+          <span>
+            <strong>Official Verification Route:</strong>{" "}
+            {official_verification?.official_route ||
+              "Open the BIS Care App > 'Verify Licence Details' or query ManakOnline (www.manakonline.in)."}
           </span>
         </div>
       </div>

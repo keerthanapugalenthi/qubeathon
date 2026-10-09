@@ -306,6 +306,24 @@ def analyze_text_claims(text, product_name=""):
             "Check whether the product category requires mandatory BIS certification under Quality Control Orders (QCOs)."
         )
 
+    # 8. Genuine Certification Verification Notice
+    official_verification = {
+        "live_api_status": "OFFICIAL_API_NOT_AVAILABLE",
+        "notice": (
+            "Official Live Verification API Not Available: The Bureau of Indian Standards "
+            "does not provide a public automated programmatic API for third-party licence validation. "
+            "Verification must be executed directly through official BIS portals or the BIS Care App."
+        ),
+        "official_route": (
+            "Open the BIS Care App > 'Verify Licence Details' (for CM/L) or 'Verify R-Number' (for CRS), "
+            "or query the ManakOnline e-BIS portal (www.manakonline.in)."
+        ),
+        "format_limitation_warning": (
+            "Format plausibility is NOT proof of genuine certification. "
+            "A syntactically valid number does not guarantee the licence is active, genuine, or issued for this product."
+        )
+    }
+
     return {
         "risk_level": risk_level,
         "risk_label": risk_label,
@@ -314,6 +332,7 @@ def analyze_text_claims(text, product_name=""):
         "reasons": reasons,
         "evidence": evidence,
         "recommended_steps": recommended_steps,
+        "official_verification": official_verification,
         "disclaimer": REGULATORY_DISCLAIMER,
         "official_resources": OFFICIAL_VERIFICATION_RESOURCES
     }
